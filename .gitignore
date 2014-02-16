@@ -1,0 +1,17 @@
+node
+node_modules
+
+*/*.class
+
+# Package Files #
+target/*.jar
+*.war
+*.ear
+
+*/.settings
+*/.classpath
+*/.project
+
+target/
+.idea/
+*.iml
