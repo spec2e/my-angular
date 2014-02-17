@@ -159,11 +159,59 @@ describe('Scope', function () {
             expect(digestFn).toThrow();
         });
 
-        it('ends the digest when the last watch is clean', function() {
+        it('ends the digest when the last watch is clean', function () {
 
             scope.array = _.range(100);
+            var watchExecutions = 0;
 
+            _.times(100, function (i) {
+                scope.$watch(
+                    function (scope) {
+                        watchExecutions++;
+                        return scope.array[i];
+                    },
+                    function (newValue, oldValue, scope) {
 
+                    }
+                );
+            });
+
+            scope.$digest();
+            expect(watchExecutions).toBe(200);
+
+            //Modify the value in the first position of the array. Set it to 420.
+            scope.array[0] = 420;
+            scope.$digest();
+            expect(watchExecutions).toBe(301);
+
+        });
+
+        it('compares based on value if specified', function () {
+
+            scope.aValue = [1, 2, 3];
+            scope.counter = 0;
+
+            //setup the watch to be a deep-watch, i.e. do value checking on the array instead of reference checking
+            scope.$watch(
+                function(scope) {
+                    return scope.aValue;
+                },
+                function(newValue, oldValue, scope) {
+                    scope.counter ++;
+                },
+                true
+            );
+
+            //first round will be successful, since we initialize the watchers
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+            //second round will check that watchers are able to deep-watch instead of doing reference watch
+            scope.aValue.push(4);
+            scope.$digest();
+            //if scope.counter has been incremented, it means that we have done a deep watch, since the adding
+            //of the value '4' to the array should trigger a value-watch
+            expect(scope.counter).toBe(2);
 
         });
 
