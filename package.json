@@ -18,7 +18,7 @@
     "time-grunt": "~0.2.1",
     "karma-ng-scenario": "~0.1.0",
     "grunt-karma": "~0.7.0",
-    "karma-chrome-launcher": "~0.1.1",
+    "karma-chrome-launcher": "~0.1.2",
     "karma-script-launcher": "~0.1.0",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-firefox-launcher": "~0.1.2",

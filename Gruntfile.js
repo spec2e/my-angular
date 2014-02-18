@@ -9,23 +9,9 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-karma');
 
     grunt.initConfig({
-        watch: {
-            js: {
-                files: [
-                    'src/**/*.js'],
-                tasks: ['newer:jshint:all']
-            },
-            jsTest: {
-                files: [
-                    'test/**/*.js'],
-                tasks: ['newer:jshint:test', 'karma']
-            },
-            gruntfile: {
-                files: ['Gruntfile.js']
-            }
-        },
 
         // Make sure code styles are up to par and there are no obvious mistakes
         jshint: {
@@ -58,6 +44,7 @@ module.exports = function (grunt) {
                 plugins: [
                     'karma-jasmine',
                     'karma-phantomjs-launcher'
+                    //'karma-chrome-launcher'
                 ]
             },
             ci: {

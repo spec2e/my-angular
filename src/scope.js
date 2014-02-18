@@ -36,7 +36,7 @@ Scope.prototype.$$digestOnce = function () {
             watcher.listenerFn(newValue, oldValue, self);
             self.$$lastDirtyWatch = watcher;
             dirty = true;
-            watcher.last = (watcher.valueEq? _.cloneDeep(newValue): newValue);
+            watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
         } else if (self.$$lastDirtyWatch === watcher) {
             //break the loop
             return false;
@@ -67,6 +67,12 @@ Scope.prototype.$$areEqual = function (newValue, oldValue, valueEq) {
     if (valueEq) {
         return _.isEqual(newValue, oldValue);
     } else {
-        return newValue === oldValue;
+        return newValue === oldValue ||
+            (typeof newValue === 'number' && typeof oldValue === 'number' &&
+                isNaN(newValue) && isNaN(oldValue));
     }
+};
+
+Scope.prototype.$eval = function (expr, arg) {
+    return expr(this, arg);
 };
