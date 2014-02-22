@@ -4,6 +4,7 @@ var Scope = function () {
     this.$$watchers = [];
     this.$$lastDirtyWatch = null;
     this.$$asyncQueue = [];
+    this.$$phase = null;
 
 };
 
@@ -55,6 +56,7 @@ Scope.prototype.$digest = function () {
     var dirty;
     //for each digest cycle, start by resetting the $$lastDirtyWatch
     this.$$lastDirtyWatch = null;
+    this.$beginPhase('$digest');
     do {
 
         while(this.$$asyncQueue.length) {
@@ -65,9 +67,11 @@ Scope.prototype.$digest = function () {
         dirty = this.$$digestOnce();
         //if dirty, check that ttl has not reached zero (0). If so, throw exception
         if (dirty && !(ttl--)) {
+            this.$clearPhase();
             throw '10 digest iterations reached!';
         }
     } while (dirty);
+    this.$clearPhase();
 };
 
 Scope.prototype.$$areEqual = function (newValue, oldValue, valueEq) {
@@ -86,8 +90,10 @@ Scope.prototype.$eval = function (expr, arg) {
 
 Scope.prototype.$apply = function (expr) {
     try {
+        this.$beginPhase('$apply');
         return this.$eval(expr);
     } finally {
+        this.$clearPhase();
         this.$digest();
     }
 };
@@ -97,4 +103,18 @@ Scope.prototype.$evalAsync = function (expr) {
         scope: this,
         expression: expr
     });
+};
+
+Scope.prototype.$beginPhase = function (phase) {
+
+    if (this.$$phase) {
+        throw this.$$phase + ' already in progress';
+    }
+
+    this.$$phase = phase;
+
+};
+
+Scope.prototype.$clearPhase = function () {
+    this.$$phase = null;
 };
