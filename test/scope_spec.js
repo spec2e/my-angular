@@ -332,6 +332,31 @@ describe('Scope', function () {
 
         });
 
+        it('schedules a $digest in $evalAsync', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$evalAsync(function (scope) {
+                //do nothing - just see if it triggers the $digest
+            });
+
+            expect(scope.counter).toBe(0);
+            waits(50);
+            runs(function () {
+                expect(scope.counter).toBe(1);
+            });
+
+        });
+        
     });
 
 });
