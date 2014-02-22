@@ -257,6 +257,55 @@ describe('Scope', function () {
             expect(result).toBe(44);
         })
 
+        it('executes $apply-ed function and calls $digest', function () {
+            scope.aValue = 'someValue';
+            scope.counter = 0;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+            scope.$apply(function (scope) {
+                scope.aValue = 'some other value';
+            });
+
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+
+        });
+
+        it('execute $evalAsync-ed function later in the same cycle', function () {
+            scope.aValue = [1, 2, 3];
+            scope.asyncEvaluated = false;
+            scope.asyncEvaluatedImmediately = false;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.$evalAsync(
+                        function (scope) {
+                            scope.asyncEvaluated = true;
+                        });
+                    scope.asyncEvaluatedImmediately = scope.asyncEvaluated;
+                }
+            )
+
+            scope.$digest();
+            expect(scope.asyncEvaluated).toBe(true);
+            expect(scope.asyncEvaluatedImmediately).toBe(false);
+
+        });
+
     });
 
 });

@@ -3,6 +3,7 @@
 var Scope = function () {
     this.$$watchers = [];
     this.$$lastDirtyWatch = null;
+    this.$$asyncQueue = [];
 
 };
 
@@ -26,7 +27,7 @@ Scope.prototype.$$digestOnce = function () {
     var self = this;
     var dirty;
 
-    //we use the ECMA script 5 method on Array - every(). It breaks the loop when falsy i returned
+    //we use the ECMA script 5 method on Array - every(). It breaks the loop when falsy is returned
     this.$$watchers.every(function (watcher) {
 
         var newValue = watcher.watchFn(self);
@@ -55,6 +56,12 @@ Scope.prototype.$digest = function () {
     //for each digest cycle, start by resetting the $$lastDirtyWatch
     this.$$lastDirtyWatch = null;
     do {
+
+        while(this.$$asyncQueue.length) {
+            var asyncTask = this.$$asyncQueue.shift();
+            asyncTask.scope.$eval(asyncTask.expression);
+        }
+
         dirty = this.$$digestOnce();
         //if dirty, check that ttl has not reached zero (0). If so, throw exception
         if (dirty && !(ttl--)) {
@@ -75,4 +82,19 @@ Scope.prototype.$$areEqual = function (newValue, oldValue, valueEq) {
 
 Scope.prototype.$eval = function (expr, arg) {
     return expr(this, arg);
+};
+
+Scope.prototype.$apply = function (expr) {
+    try {
+        return this.$eval(expr);
+    } finally {
+        this.$digest();
+    }
+};
+
+Scope.prototype.$evalAsync = function (expr) {
+    this.$$asyncQueue.push({
+        scope: this,
+        expression: expr
+    });
 };
