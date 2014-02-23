@@ -408,6 +408,55 @@ describe('Scope', function () {
 
         });
 
+        it('catches exceptions in watch functions and continues', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+        });
+
+        it('catches exceptions in listener functions and continues', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            //This will produce an error. This test case will test the the next $watch will still be handled
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    throw 'Error';
+                }
+            );
+
+            //This $watch should stille be executed, even if the pre $watch had failed...
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+        });
+
+
+
     });
 
 });

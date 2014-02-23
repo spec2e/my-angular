@@ -32,17 +32,21 @@ Scope.prototype.$$digestOnce = function () {
     //we use the ECMA script 5 method on Array - every(). It breaks the loop when falsy is returned
     this.$$watchers.every(function (watcher) {
 
-        var newValue = watcher.watchFn(self);
-        var oldValue = watcher.last;
+        try {
+            var newValue = watcher.watchFn(self);
+            var oldValue = watcher.last;
 
-        if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
-            watcher.listenerFn(newValue, oldValue, self);
-            self.$$lastDirtyWatch = watcher;
-            dirty = true;
-            watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
-        } else if (self.$$lastDirtyWatch === watcher) {
-            //break the loop
-            return false;
+            if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
+                watcher.listenerFn(newValue, oldValue, self);
+                self.$$lastDirtyWatch = watcher;
+                dirty = true;
+                watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
+            } else if (self.$$lastDirtyWatch === watcher) {
+                //break the loop
+                return false;
+            }
+        } catch (e) {
+            console.error(e);
         }
         //stay in the loop
         return true;
