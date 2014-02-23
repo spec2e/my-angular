@@ -29,31 +29,10 @@ module.exports = function (grunt) {
         },
 
         karma: {
-            options: {
-                frameworks: ['jasmine'],
-                files: [
-                    'node_modules/lodash/dist/lodash.js',
-                    'node_modules/jquery/dist/jquery.js',
-                    'src/**/*.js',
-                    'test/**/*.js'
-                ],
-                reporters: ['progress'],
-                port: 9876,
-                browsers: ['PhantomJS'],
-                singleRun: true,
-                plugins: [
-                    'karma-jasmine',
-                    'karma-phantomjs-launcher'
-                    //'karma-chrome-launcher'
-                ]
-            },
-            ci: {
-                autoWatch: false
-            },
-            dev: {
-                singleRun: false,
-                autoWatch: true
+            unit: {
+                configFile: 'karma.conf.js'
             }
+
         }
     });
 
