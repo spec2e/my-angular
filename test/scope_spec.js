@@ -307,7 +307,7 @@ describe('Scope', function () {
         });
 
         it('has a $$phase field whose value is the current digest phase', function () {
-            scope.aValue = [1,2,3];
+            scope.aValue = [1, 2, 3];
             scope.phaseInWatchFunction = undefined;
             scope.phaseInListenerFunction = undefined;
             scope.phaseInApplyFunction = undefined;
@@ -321,7 +321,7 @@ describe('Scope', function () {
                     scope.phaseInListenerFunction = scope.$$phase;
                 }
             );
-            
+
             scope.$apply(function (scope) {
                 scope.phaseInApplyFunction = scope.$$phase;
             });
@@ -341,7 +341,7 @@ describe('Scope', function () {
                     return scope.aValue;
                 },
                 function (newValue, oldValue, scope) {
-                    scope.counter ++;
+                    scope.counter++;
                 }
             );
 
@@ -355,8 +355,59 @@ describe('Scope', function () {
                 expect(scope.counter).toBe(1);
             });
 
+
         });
-        
+
+        it('runs a $$postDigest function after each $digest', function () {
+
+            scope.counter = 0;
+
+            scope.$$postDigest(function () {
+                scope.counter++;
+            });
+
+            //Test that $$postDigest does not run before the $digest has been called
+            expect(scope.counter).toBe(0);
+
+            scope.$digest();
+            //Test that $$postDigest has been run after the $digest has been called
+            expect(scope.counter).toBe(1);
+
+            scope.$digest();
+            //Test that $$postDigest has not been again after a new $digest has been issued
+            expect(scope.counter).toBe(1);
+
+
+        });
+
+        it('does not include $$postDigest in the digest cycle', function () {
+            var originalValue = 'original value';
+            var changedValue = 'changed value';
+            scope.aValue = originalValue;
+
+            scope.$$postDigest(function () {
+                scope.aValue = changedValue;
+            });
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.watchedValue = newValue;
+                }
+            );
+
+            scope.$digest();
+            //Test that the first call to $digest does not have effect on the scope.watchedValue
+            expect(scope.watchedValue).toBe(originalValue);
+
+            scope.$digest();
+            //Test that the second $digest now will have the scope.watchedValue set to 'changed value'
+            expect(scope.watchedValue).toBe(changedValue);
+
+        });
+
     });
 
 });
