@@ -9,17 +9,33 @@ var Scope = function () {
 
 };
 
+
+function initWatchVal(){};
+
 Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
+
+    var self = this;
 
     var watcher = {
         watchFn: watchFn,
         listenerFn: listenerFn || function () {
         },
         //test for deep-watch. Double negate converts whatever the value, to a boolean. Default is false.
-        valueEq: !!valueEq
+        valueEq: !!valueEq,
+        last: initWatchVal
     };
 
-    this.$$watchers.push(watcher);
+    self.$$watchers.unshift(watcher);
+    this.$$lastDirtyWatch = null;
+
+    return function () {
+        var indexOfWatcher = self.$$watchers.indexOf(watcher);
+        if (indexOfWatcher >= 0) {
+            self.$$watchers.splice(indexOfWatcher, 1);
+            self.$$lastDirtyWatch = null;
+        }
+    };
+
 
 };
 
@@ -27,23 +43,27 @@ Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
 Scope.prototype.$$digestOnce = function () {
 
     var self = this;
-    var dirty;
+    var newValue, oldValue, dirty;
 
     //we use the ECMA script 5 method on Array - every(). It breaks the loop when falsy is returned
-    this.$$watchers.every(function (watcher) {
+    _.forEachRight(this.$$watchers, function (watcher) {
 
         try {
-            var newValue = watcher.watchFn(self);
-            var oldValue = watcher.last;
+            if (watcher) {
+                newValue = watcher.watchFn(self);
+                oldValue = watcher.last;
 
-            if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
-                watcher.listenerFn(newValue, oldValue, self);
-                self.$$lastDirtyWatch = watcher;
-                dirty = true;
-                watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
-            } else if (self.$$lastDirtyWatch === watcher) {
-                //break the loop
-                return false;
+                if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
+                    self.$$lastDirtyWatch = watcher;
+                    watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
+                    watcher.listenerFn(newValue,
+                        (oldValue === initWatchVal ? newValue : oldValue), self);
+                    dirty = true;
+
+                } else if (self.$$lastDirtyWatch === watcher) {
+                    //break the loop
+                    return false;
+                }
             }
         } catch (e) {
             console.error(e);
@@ -64,7 +84,7 @@ Scope.prototype.$digest = function () {
     this.$beginPhase('$digest');
     do {
 
-        while(this.$$asyncQueue.length) {
+        while (this.$$asyncQueue.length) {
             try {
                 var asyncTask = this.$$asyncQueue.shift();
                 asyncTask.scope.$eval(asyncTask.expression);

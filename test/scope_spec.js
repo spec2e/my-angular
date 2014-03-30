@@ -80,6 +80,42 @@ describe('Scope', function () {
 
         });
 
+        it('calls listener when watch value is first undefined', function () {
+            scope.counter = 0;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.someValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+        });
+
+        it('calls listener with new value as the old value, the first time', function () {
+            scope.someValue = 123;
+            var oldValuesGiven;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.someValue;
+                },
+                function (newValue, oldValue, scope) {
+                    oldValuesGiven = oldValue;
+                }
+            );
+
+            scope.$digest();
+            expect(oldValuesGiven).toBe(123);
+
+        });
+        
+        
+        
         it('may have watchers that omit the listener function', function () {
 
             var watchFn = jasmine.createSpy().andReturn('something');
@@ -473,14 +509,14 @@ describe('Scope', function () {
                     return scope.aValue;
                 },
                 function (newValue, oldValue, scope) {
-                    scope.counter ++;
+                    scope.counter++;
                 }
             );
 
             scope.$evalAsync(function () {
                 throw 'Error';
             });
-            
+
             setTimeout(function () {
                 expect(scope.counter).toBe(1);
                 done();
@@ -498,14 +534,139 @@ describe('Scope', function () {
             scope.$$postDigest(function () {
                 didRun = true;
             });
-            
+
             scope.$digest();
             expect(didRun).toBe(true);
+        });
+
+
+        it('allows destroying a $watch with a removal function', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            var destroyWatch = scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter++;
+                }
+            );
+
+            scope.$digest();
+            //expect this to be 1, since the watch has run first time
+            expect(scope.counter).toBe(1);
+
+            scope.aValue = 'def';
+            scope.$digest();
+            //expect scope.counter to be 2, since we changed the watched value and called $digest
+            expect(scope.counter).toBe(2);
+
+            destroyWatch();
+            scope.$digest();
+            //This should still be 2 even though we changed the watched expression, since we called the function to remove the watch
+            expect(scope.counter).toBe(2);
 
 
         });
 
+        it('allows destroying a watch during a $digest', function () {
+
+            scope.aValue = 'abc';
+            var watchCalls = [];
+
+            scope.$watch(
+                function (scope) {
+                    watchCalls.push('first');
+                    return scope.aValue;
+                }
+            );
+
+            var destroyWatch = scope.$watch(
+                function (scope) {
+                    watchCalls.push('second');
+                    destroyWatch();
+                }
+            );
+
+            scope.$watch(
+                function (scope) {
+                    watchCalls.push('third');
+                    return scope.aValue;
+                }
+            );
+
+            scope.$digest();
+            expect(watchCalls).toEqual(['first', 'second', 'third', 'first', 'third']);
+
+        });
+
+
+        it('allows a watch to destroy another during watching', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            var destroyWatch  = null;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    destroyWatch();
+                }
+            );
+
+            destroyWatch = scope.$watch(
+                function (scope) {
+                },
+                function (newValue, oldValue, scope) {
+                }
+            );
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+        });
+
+        it('allows destroying several watches during $digest', function () {
+            scope.aValue = 'abc';
+            scope.counter = 0;
+
+            var destroyWatch1, destroyWatch2;
+            
+            destroyWatch1 = scope.$watch(
+                function (scope) {
+                    destroyWatch1();
+                    destroyWatch2();
+                }
+            );
+
+            destroyWatch2 = scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(0);
+
+        });
+
     });
+
 
 });
 
