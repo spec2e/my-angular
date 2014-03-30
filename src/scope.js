@@ -65,8 +65,12 @@ Scope.prototype.$digest = function () {
     do {
 
         while(this.$$asyncQueue.length) {
-            var asyncTask = this.$$asyncQueue.shift();
-            asyncTask.scope.$eval(asyncTask.expression);
+            try {
+                var asyncTask = this.$$asyncQueue.shift();
+                asyncTask.scope.$eval(asyncTask.expression);
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         dirty = this.$$digestOnce();
@@ -79,8 +83,12 @@ Scope.prototype.$digest = function () {
     this.$clearPhase();
 
     while (this.$$postDigestQueue.length) {
-        var postDigestFn = this.$$postDigestQueue.shift();
-        postDigestFn();
+        try {
+            var postDigestFn = this.$$postDigestQueue.shift();
+            postDigestFn();
+        } catch (e) {
+            console.error(e);
+        }
     }
 };
 
