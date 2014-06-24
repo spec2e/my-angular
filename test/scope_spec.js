@@ -757,6 +757,49 @@ describe('Scope', function () {
 
 
         });
+
+        it('shadows a parents property with the same name', function () {
+            var parent = new Scope();
+            var child = parent.$new();
+
+            parent.name = 'joe';
+            child.name = 'jill';
+
+            expect(parent.name).toBe('joe');
+            expect(child.name).toBe('jill');
+        });
+
+        it('does not shadow members of parent scopes attributes', function () {
+            var parent = new Scope();
+            var child = parent.$new();
+            
+            parent.user = {user: 'joe'};
+            child.user.name = 'jill';
+
+            expect(child.user.name).toBe('jill');
+            expect(parent.user.name).toBe('jill');
+
+        });
+
+        it('does not digest its parent(s)', function () {
+            var parent = new Scope();
+            var child = parent.$new();
+
+            parent.aValue = 'abc';
+
+            parent.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.aValueWas = newValue;
+                }
+            );
+
+            child.$digest();
+            expect(child.aValueWas).toBeUndefined();
+
+        });
     });
 
 });
