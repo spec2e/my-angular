@@ -7,6 +7,7 @@ var Scope = function () {
     this.$$postDigestQueue = [];
     this.$$phase = null;
     this.$$children = [];
+    this.$$root = this;
 
 };
 
@@ -135,7 +136,7 @@ Scope.prototype.$apply = function (expr) {
         return this.$eval(expr);
     } finally {
         this.$clearPhase();
-        this.$digest();
+        this.$$root.$digest();
     }
 };
 

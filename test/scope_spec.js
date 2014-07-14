@@ -801,11 +801,11 @@ describe('Scope', function () {
 
         });
 
-        it('keeps a record of its childre', function () {
+        it('keeps a record of its children', function () {
             var parent = new Scope();
             var child1 = parent.$new();
             var child2 = parent.$new();
-            var child2_1 = parent.$new();
+            var child2_1 = child2.$new();
 
             expect(parent.$$children.length).toBe(2);
             expect(parent.$$children[0]).toBe(child1);
