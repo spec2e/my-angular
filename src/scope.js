@@ -28,13 +28,13 @@ Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
     };
 
     self.$$watchers.unshift(watcher);
-    this.$$lastDirtyWatch = null;
+    this.$$root.$$lastDirtyWatch = null;
 
     return function () {
         var indexOfWatcher = self.$$watchers.indexOf(watcher);
         if (indexOfWatcher >= 0) {
             self.$$watchers.splice(indexOfWatcher, 1);
-            self.$$lastDirtyWatch = null;
+            self.$$root.$$lastDirtyWatch = null;
         }
     };
 
@@ -58,13 +58,13 @@ Scope.prototype.$$digestOnce = function () {
                     oldValue = watcher.last;
 
                     if (!scope.$$areEqual(newValue, oldValue, watcher.valueEq)) {
-                        self.$$lastDirtyWatch = watcher;
+                        self.$$root.$$lastDirtyWatch = watcher;
                         watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
                         watcher.listenerFn(newValue,
                             (oldValue === initWatchVal ? newValue : oldValue), scope);
                         dirty = true;
 
-                    } else if (self.$$lastDirtyWatch === watcher) {
+                    } else if (self.$$root.$$lastDirtyWatch === watcher) {
                         continueLoop = false;
                         return false;
                     }
@@ -84,7 +84,7 @@ Scope.prototype.$digest = function () {
     var ttl = 10;
     var dirty;
     //for each digest cycle, start by resetting the $$lastDirtyWatch
-    this.$$lastDirtyWatch = null;
+    this.$$root.$$lastDirtyWatch = null;
     this.$beginPhase('$digest');
     do {
 
@@ -146,7 +146,7 @@ Scope.prototype.$evalAsync = function (expr) {
     if (!self.$$phase && !self.$$asyncQueue.length) {
         setTimeout(function () {
             if (self.$$asyncQueue.length) {
-                self.$digest();
+                self.$$root.$digest();
             }
         }, 0);
     }
