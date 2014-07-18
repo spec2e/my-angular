@@ -1,10 +1,10 @@
 /* jshint globalstrict: true */
 /* global Scope: false, jasmine: false */
-'use strict';
+"use strict";
 
-describe('Scope', function () {
+describe("Scope", function () {
 
-    it('can be constructed and used as an object', function () {
+    it("can be constructed and used as an object", function () {
 
         var scope = new Scope();
         scope.aProperty = 1;
@@ -14,7 +14,7 @@ describe('Scope', function () {
     });
 
 
-    describe('digest', function () {
+    describe("digest", function () {
 
         var scope;
 
@@ -22,7 +22,7 @@ describe('Scope', function () {
             scope = new Scope();
         });
 
-        it('calls the listener function of a watch on first $digest', function () {
+        it("calls the listener function of a watch on first $digest", function () {
 
             var watchFn = function () {
                 return "watch";
@@ -37,7 +37,7 @@ describe('Scope', function () {
 
         });
 
-        it('calls the watch function with the scope as argument', function () {
+        it("calls the watch function with the scope as argument", function () {
             var watchFn = jasmine.createSpy();
             var listenerFn = function () {
             };
@@ -49,9 +49,9 @@ describe('Scope', function () {
 
         });
 
-        it('calls the listener function when the watched value changes', function () {
+        it("calls the listener function when the watched value changes", function () {
 
-            scope.someValue = 'a';
+            scope.someValue = "a";
             scope.counter = 0;
 
             var watchFn = function (scope) {
@@ -71,7 +71,7 @@ describe('Scope', function () {
             scope.$digest();
             expect(scope.counter).toBe(1);
 
-            scope.someValue = 'b';
+            scope.someValue = "b";
             expect(scope.counter).toBe(1);
 
             scope.$digest();
@@ -80,7 +80,7 @@ describe('Scope', function () {
 
         });
 
-        it('calls listener when watch value is first undefined', function () {
+        it("calls listener when watch value is first undefined", function () {
             scope.counter = 0;
 
             scope.$watch(
@@ -96,7 +96,7 @@ describe('Scope', function () {
             expect(scope.counter).toBe(1);
         });
 
-        it('calls listener with new value as the old value, the first time', function () {
+        it("calls listener with new value as the old value, the first time", function () {
             scope.someValue = 123;
             var oldValuesGiven;
 
@@ -115,9 +115,9 @@ describe('Scope', function () {
         });
 
 
-        it('may have watchers that omit the listener function', function () {
+        it("may have watchers that omit the listener function", function () {
 
-            var watchFn = jasmine.createSpy().andReturn('something');
+            var watchFn = jasmine.createSpy().andReturn("something");
             scope.$watch(watchFn);
 
             scope.$digest();
@@ -125,9 +125,9 @@ describe('Scope', function () {
             expect(watchFn).toHaveBeenCalled();
         });
 
-        it('triggers chained watchers in the same digest', function () {
+        it("triggers chained watchers in the same digest", function () {
 
-            scope.name = 'jane';
+            scope.name = "jane";
 
             scope.$watch(
                 function (scope) {
@@ -135,7 +135,7 @@ describe('Scope', function () {
                 },
                 function (newValue, oldValue, scope) {
                     if (newValue) {
-                        scope.initial = newValue.substring(0, 1) + '.';
+                        scope.initial = newValue.substring(0, 1) + ".";
                     }
                 }
             );
@@ -153,15 +153,15 @@ describe('Scope', function () {
 
             scope.$digest();
 
-            expect(scope.initial).toBe('J.');
+            expect(scope.initial).toBe("J.");
 
-            scope.name = 'Bob';
+            scope.name = "Bob";
             scope.$digest();
 
-            expect(scope.initial).toBe('B.');
+            expect(scope.initial).toBe("B.");
         });
 
-        it('gives up on the watches after 10 iterations', function () {
+        it("gives up on the watches after 10 iterations", function () {
 
             scope.counterA = 0;
             scope.counterB = 0;
@@ -194,7 +194,7 @@ describe('Scope', function () {
             expect(digestFn).toThrow();
         });
 
-        it('ends the digest when the last watch is clean', function () {
+        it("ends the digest when the last watch is clean", function () {
 
             scope.array = _.range(100);
             var watchExecutions = 0;
@@ -221,7 +221,7 @@ describe('Scope', function () {
 
         });
 
-        it('compares based on value if specified', function () {
+        it("compares based on value if specified", function () {
 
             scope.aValue = [1, 2, 3];
             scope.counter = 0;
@@ -245,12 +245,12 @@ describe('Scope', function () {
             scope.aValue.push(4);
             scope.$digest();
             //if scope.counter has been incremented, it means that we have done a deep watch, since the adding
-            //of the value '4' to the array should trigger a value-watch
+            //of the value "4" to the array should trigger a value-watch
             expect(scope.counter).toBe(2);
 
         });
 
-        it('correctlly handles NaNs', function () {
+        it("correctlly handles NaNs", function () {
 
             scope.number = 0 / 0;
             scope.counter = 0;
@@ -272,7 +272,7 @@ describe('Scope', function () {
 
         });
 
-        it('executes $evaled function and returns result', function () {
+        it("executes $evaled function and returns result", function () {
             scope.aValue = 42;
 
             var result = scope.$eval(function (scope) {
@@ -282,7 +282,7 @@ describe('Scope', function () {
             expect(result).toBe(42);
         });
 
-        it('passes the second $eval argument straight through', function () {
+        it("passes the second $eval argument straight through", function () {
             scope.aValue = 42;
 
             var result = scope.$eval(function (scope, arg) {
@@ -292,8 +292,8 @@ describe('Scope', function () {
             expect(result).toBe(44);
         })
 
-        it('executes $apply-ed function and calls $digest', function () {
-            scope.aValue = 'someValue';
+        it("executes $apply-ed function and calls $digest", function () {
+            scope.aValue = "someValue";
             scope.counter = 0;
 
             scope.$watch(
@@ -309,7 +309,7 @@ describe('Scope', function () {
             expect(scope.counter).toBe(1);
 
             scope.$apply(function (scope) {
-                scope.aValue = 'some other value';
+                scope.aValue = "some other value";
             });
 
             scope.$digest();
@@ -317,7 +317,7 @@ describe('Scope', function () {
 
         });
 
-        it('execute $evalAsync-ed function later in the same cycle', function () {
+        it("execute $evalAsync-ed function later in the same cycle", function () {
             scope.aValue = [1, 2, 3];
             scope.asyncEvaluated = false;
             scope.asyncEvaluatedImmediately = false;
@@ -341,7 +341,7 @@ describe('Scope', function () {
 
         });
 
-        it('has a $$phase field whose value is the current digest phase', function () {
+        it("has a $$phase field whose value is the current digest phase", function () {
             scope.aValue = [1, 2, 3];
             scope.phaseInWatchFunction = undefined;
             scope.phaseInListenerFunction = undefined;
@@ -361,14 +361,14 @@ describe('Scope', function () {
                 scope.phaseInApplyFunction = scope.$$phase;
             });
 
-            expect(scope.phaseInWatchFunction).toBe('$digest');
-            expect(scope.phaseInListenerFunction).toBe('$digest');
-            expect(scope.phaseInApplyFunction).toBe('$apply');
+            expect(scope.phaseInWatchFunction).toBe("$digest");
+            expect(scope.phaseInListenerFunction).toBe("$digest");
+            expect(scope.phaseInApplyFunction).toBe("$apply");
 
         });
 
-        it('schedules a $digest in $evalAsync', function () {
-            scope.aValue = 'abc';
+        it("schedules a $digest in $evalAsync", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             scope.$watch(
@@ -393,7 +393,7 @@ describe('Scope', function () {
 
         });
 
-        it('runs a $$postDigest function after each $digest', function () {
+        it("runs a $$postDigest function after each $digest", function () {
 
             scope.counter = 0;
 
@@ -415,9 +415,9 @@ describe('Scope', function () {
 
         });
 
-        it('does not include $$postDigest in the digest cycle', function () {
-            var originalValue = 'original value';
-            var changedValue = 'changed value';
+        it("does not include $$postDigest in the digest cycle", function () {
+            var originalValue = "original value";
+            var changedValue = "changed value";
             scope.aValue = originalValue;
 
             scope.$$postDigest(function () {
@@ -438,18 +438,18 @@ describe('Scope', function () {
             expect(scope.watchedValue).toBe(originalValue);
 
             scope.$digest();
-            //Test that the second $digest now will have the scope.watchedValue set to 'changed value'
+            //Test that the second $digest now will have the scope.watchedValue set to "changed value"
             expect(scope.watchedValue).toBe(changedValue);
 
         });
 
-        it('catches exceptions in watch functions and continues', function () {
-            scope.aValue = 'abc';
+        it("catches exceptions in watch functions and continues", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             scope.$watch(
                 function (scope) {
-                    throw 'Error';
+                    throw "Error";
                 },
                 function (newValue, oldValue, scope) {
 
@@ -470,8 +470,8 @@ describe('Scope', function () {
 
         });
 
-        it('catches exceptions in listener functions and continues', function () {
-            scope.aValue = 'abc';
+        it("catches exceptions in listener functions and continues", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             //This will produce an error. This test case will test the the next $watch will still be handled
@@ -480,7 +480,7 @@ describe('Scope', function () {
                     return scope.aValue;
                 },
                 function (newValue, oldValue, scope) {
-                    throw 'Error';
+                    throw "Error";
                 }
             );
 
@@ -499,8 +499,8 @@ describe('Scope', function () {
 
         });
 
-        it('catches exceptions in $evalAsync', function () {
-            scope.aValue = 'abc';
+        it("catches exceptions in $evalAsync", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             scope.$watch(
@@ -513,7 +513,7 @@ describe('Scope', function () {
             );
 
             scope.$evalAsync(function () {
-                throw 'Error';
+                throw "Error";
             });
 
             setTimeout(function () {
@@ -523,11 +523,11 @@ describe('Scope', function () {
         });
 
 
-        it('catches exceptions in $$postDigest', function () {
+        it("catches exceptions in $$postDigest", function () {
             var didRun = false;
 
             scope.$$postDigest(function () {
-                throw 'Error';
+                throw "Error";
             });
 
             scope.$$postDigest(function () {
@@ -539,8 +539,8 @@ describe('Scope', function () {
         });
 
 
-        it('allows destroying a $watch with a removal function', function () {
-            scope.aValue = 'abc';
+        it("allows destroying a $watch with a removal function", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             var destroyWatch = scope.$watch(
@@ -556,7 +556,7 @@ describe('Scope', function () {
             //expect this to be 1, since the watch has run first time
             expect(scope.counter).toBe(1);
 
-            scope.aValue = 'def';
+            scope.aValue = "def";
             scope.$digest();
             //expect scope.counter to be 2, since we changed the watched value and called $digest
             expect(scope.counter).toBe(2);
@@ -569,40 +569,40 @@ describe('Scope', function () {
 
         });
 
-        it('allows destroying a watch during a $digest', function () {
+        it("allows destroying a watch during a $digest", function () {
 
-            scope.aValue = 'abc';
+            scope.aValue = "abc";
             var watchCalls = [];
 
             scope.$watch(
                 function (scope) {
-                    watchCalls.push('first');
+                    watchCalls.push("first");
                     return scope.aValue;
                 }
             );
 
             var destroyWatch = scope.$watch(
                 function (scope) {
-                    watchCalls.push('second');
+                    watchCalls.push("second");
                     destroyWatch();
                 }
             );
 
             scope.$watch(
                 function (scope) {
-                    watchCalls.push('third');
+                    watchCalls.push("third");
                     return scope.aValue;
                 }
             );
 
             scope.$digest();
-            expect(watchCalls).toEqual(['first', 'second', 'third', 'first', 'third']);
+            expect(watchCalls).toEqual(["first", "second", "third", "first", "third"]);
 
         });
 
 
-        it('allows a watch to destroy another during watching', function () {
-            scope.aValue = 'abc';
+        it("allows a watch to destroy another during watching", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             var destroyWatch = null;
@@ -637,8 +637,8 @@ describe('Scope', function () {
 
         });
 
-        it('allows destroying several watches during $digest', function () {
-            scope.aValue = 'abc';
+        it("allows destroying several watches during $digest", function () {
+            scope.aValue = "abc";
             scope.counter = 0;
 
             var destroyWatch1, destroyWatch2;
@@ -666,9 +666,9 @@ describe('Scope', function () {
 
     });
 
-    describe('Inheritance', function () {
+    describe("Inheritance", function () {
 
-        it('Inherits the parents properties', function () {
+        it("Inherits the parents properties", function () {
             var parent = new Scope();
             parent.aValue = [1, 2, 3];
 
@@ -677,7 +677,7 @@ describe('Scope', function () {
             expect(child.aValue).toEqual([1, 2, 3]);
         });
 
-        it('Does not cause a parent to inherit its properties', function () {
+        it("Does not cause a parent to inherit its properties", function () {
 
             var parent = new Scope();
 
@@ -688,7 +688,7 @@ describe('Scope', function () {
             expect(parent.aValue).toBeUndefined();
         });
 
-        it('It inherit the parents properties whenever they are defined', function () {
+        it("It inherit the parents properties whenever they are defined", function () {
 
             var parent = new Scope();
             var child = parent.$new();
@@ -698,7 +698,7 @@ describe('Scope', function () {
             expect(child.aValue).toEqual([1, 2, 3]);
         });
 
-        it('Can manipulate a parent scopes property', function () {
+        it("Can manipulate a parent scopes property", function () {
             var parent = new Scope();
             var child = parent.$new();
             parent.aValue = [1, 2, 3];
@@ -709,7 +709,7 @@ describe('Scope', function () {
             expect(parent.aValue).toEqual([1, 2, 3, 4]);
         });
 
-        it('Can watch a property in the parent', function () {
+        it("Can watch a property in the parent", function () {
             var parent = new Scope();
             var child = parent.$new();
             parent.aValue = [1, 2, 3];
@@ -733,7 +733,7 @@ describe('Scope', function () {
             expect(child.counter).toBe(2);
         });
 
-        it('Can be nested at any depth', function () {
+        it("Can be nested at any depth", function () {
             var a = new Scope();
             var aa = a.$new();
             var aaa = aa.$new();
@@ -758,34 +758,34 @@ describe('Scope', function () {
 
         });
 
-        it('shadows a parents property with the same name', function () {
+        it("shadows a parents property with the same name", function () {
             var parent = new Scope();
             var child = parent.$new();
 
-            parent.name = 'joe';
-            child.name = 'jill';
+            parent.name = "joe";
+            child.name = "jill";
 
-            expect(parent.name).toBe('joe');
-            expect(child.name).toBe('jill');
+            expect(parent.name).toBe("joe");
+            expect(child.name).toBe("jill");
         });
 
-        it('does not shadow members of parent scopes attributes', function () {
+        it("does not shadow members of parent scopes attributes", function () {
             var parent = new Scope();
             var child = parent.$new();
 
-            parent.user = {user: 'joe'};
-            child.user.name = 'jill';
+            parent.user = {user: "joe"};
+            child.user.name = "jill";
 
-            expect(child.user.name).toBe('jill');
-            expect(parent.user.name).toBe('jill');
+            expect(child.user.name).toBe("jill");
+            expect(parent.user.name).toBe("jill");
 
         });
 
-        it('does not digest its parent(s)', function () {
+        it("does not digest its parent(s)", function () {
             var parent = new Scope();
             var child = parent.$new();
 
-            parent.aValue = 'abc';
+            parent.aValue = "abc";
 
             parent.$watch(
                 function (scope) {
@@ -801,7 +801,7 @@ describe('Scope', function () {
 
         });
 
-        it('keeps a record of its children', function () {
+        it("keeps a record of its children", function () {
             var parent = new Scope();
             var child1 = parent.$new();
             var child2 = parent.$new();
@@ -817,11 +817,11 @@ describe('Scope', function () {
 
         });
 
-        it('digests its children', function () {
+        it("digests its children", function () {
             var parent = new Scope();
             var child = parent.$new();
 
-            parent.aValue = 'abc';
+            parent.aValue = "abc";
             child.$watch(function (scope) {
                     return scope.aValue;
                 }, function (newValue, oldValue, scope) {
@@ -830,29 +830,30 @@ describe('Scope', function () {
             );
 
             parent.$digest();
-            expect(child.aValueWas).toBe('abc');
+            expect(child.aValueWas).toBe("abc");
         });
 
-        it('digests from root on $apply', function () {
+        it("digests from root on $apply", function () {
             var parent = new Scope();
             var child = parent.$new();
             var child2 = child.$new();
 
-            parent.aValue = 'abc';
+            parent.aValue = "abc";
             parent.counter = 0;
 
             parent.$watch(function (scope) {
                 return scope.aValue;
             }, function (newValue, oldValue, scope) {
-                scope.counter ++;
+                scope.counter++;
             })
 
-            child2.$apply(function (scope) {})
+            child2.$apply(function (scope) {
+            })
 
             expect(parent.counter).toBe(1);
         });
 
-        it('it schedules a digest from root on $evalAsync', function () {
+        it("it schedules a digest from root on $evalAsync", function () {
 
             var parent = new Scope();
             var child = parent.$new();
@@ -866,20 +867,71 @@ describe('Scope', function () {
                     return scope.aValue;
                 },
                 function (oldValue, newValue, scope) {
-                    scope.counter ++;
+                    scope.counter++;
                 }
             );
 
             child2.$evalAsync(function (scope) {
 
             });
-            
+
             setTimeout(function () {
                 expect(parent.counter).toBe(1);
                 done();
 
             }, 50);
 
+
+        });
+
+        it("does not have access to its parent attributes when isolated", function () {
+
+            var parent = new Scope();
+            var child = parent.$new(true);
+
+            parent.aValue = "abc";
+
+            expect(child.aValue).toBeUndefined();
+
+
+        });
+
+        it("can not watch parent attributes when isolated", function () {
+
+            var parent = new Scope();
+            var child = parent.$new(true);
+
+            parent.aValue = "abc";
+
+            child.$watch(function (scope) {
+                    return scope.aValue;
+                },
+                function (oldValue, newValue, scope) {
+                    scope.aValueWas = newValue;
+                }
+            );
+
+            child.$digest();
+            expect(child.aValueWas).toBeUndefined();
+        });
+
+        it("digests its isolated children", function () {
+
+            var parent = new Scope();
+            var child = parent.$new(true);
+
+            child.aValue = "abc";
+            child.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.aValueWas = newValue;
+                }
+            );
+
+            parent.$digest();
+            expect(child.aValueWas).toBe("abc");
 
         });
     });
