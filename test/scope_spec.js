@@ -934,6 +934,61 @@ describe("Scope", function () {
             expect(child.aValueWas).toBe("abc");
 
         });
+
+        it("digests from root on $apply when isolated", function () {
+
+            var parent = new Scope();
+            var child = parent.$new(true);
+            var child2 = child.$new();
+
+            parent.aValue = "abc";
+            parent.counter = 0;
+            parent.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            child2.$apply(function (scope) {
+                //empty...
+            });
+
+            expect(parent.counter).toBe(1);
+
+        });
+
+        it("schedules a digest from root on $evalAsync when isolated", function () {
+
+            var parent = new Scope();
+            var child = parent.$new(true);
+            var child2 = child.$new();
+
+            parent.aValue = 0;
+            parent.counter = 0;
+
+            parent.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (oldValue, newValue, scope) {
+                    scope.counter++;
+                }
+            );
+
+            child2.$evalAsync(function (scope) {
+                console.log("1");
+            });
+
+            setTimeout(function () {
+
+                expect(parent.counter).toBe(1);
+                done();
+
+            }, 50);
+        });
     });
 
 });

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var Scope = function () {
     this.$$watchers = [];
@@ -85,7 +85,7 @@ Scope.prototype.$digest = function () {
     var dirty;
     //for each digest cycle, start by resetting the $$lastDirtyWatch
     this.$$root.$$lastDirtyWatch = null;
-    this.$beginPhase('$digest');
+    this.$beginPhase("$digest");
     do {
 
         while (this.$$asyncQueue.length) {
@@ -93,7 +93,7 @@ Scope.prototype.$digest = function () {
                 var asyncTask = this.$$asyncQueue.shift();
                 asyncTask.scope.$eval(asyncTask.expression);
             } catch (e) {
-                console.error(e);
+                console.error("async: " + e);
             }
         }
 
@@ -101,7 +101,7 @@ Scope.prototype.$digest = function () {
         //if dirty, check that ttl has not reached zero (0). If so, throw exception
         if (dirty && !(ttl--)) {
             this.$clearPhase();
-            throw '10 digest iterations reached!';
+            throw "10 digest iterations reached!";
         }
     } while (dirty);
     this.$clearPhase();
@@ -121,7 +121,7 @@ Scope.prototype.$$areEqual = function (newValue, oldValue, valueEq) {
         return _.isEqual(newValue, oldValue);
     } else {
         return newValue === oldValue ||
-            (typeof newValue === 'number' && typeof oldValue === 'number' &&
+            (typeof newValue === "number" && typeof oldValue === "number" &&
                 isNaN(newValue) && isNaN(oldValue));
     }
 };
@@ -132,7 +132,7 @@ Scope.prototype.$eval = function (expr, arg) {
 
 Scope.prototype.$apply = function (expr) {
     try {
-        this.$beginPhase('$apply');
+        this.$beginPhase("$apply");
         return this.$eval(expr);
     } finally {
         this.$clearPhase();
@@ -160,7 +160,7 @@ Scope.prototype.$evalAsync = function (expr) {
 Scope.prototype.$beginPhase = function (phase) {
 
     if (this.$$phase) {
-        throw this.$$phase + ' already in progress';
+        throw this.$$phase + " already in progress";
     }
 
     this.$$phase = phase;
@@ -175,10 +175,19 @@ Scope.prototype.$$postDigest = function (fn) {
     this.$$postDigestQueue.push(fn);
 };
 
-Scope.prototype.$new = function () {
-    var ChildScope = function () {};
-    ChildScope.prototype = this;
-    var child = new ChildScope();
+Scope.prototype.$new = function (isolated) {
+
+    var child;
+
+    if (isolated) {
+        child = new Scope();
+        child.$$root = this.$$root;
+    } else {
+        var ChildScope = function () {};
+        ChildScope.prototype = this;
+        child = new ChildScope();
+    }
+
     this.$$children.push(child);
     child.$$watchers = [];
     child.$$children = [];
