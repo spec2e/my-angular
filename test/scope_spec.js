@@ -1,6 +1,6 @@
 /* jshint globalstrict: true */
-/* global Scope: false, jasmine: false */
-"use strict";
+/* global Scope: false */
+'use strict';
 
 describe("Scope", function () {
 
@@ -385,11 +385,12 @@ describe("Scope", function () {
             });
 
             expect(scope.counter).toBe(0);
+
             waits(50);
+
             runs(function () {
                 expect(scope.counter).toBe(1);
             });
-
 
         });
 
@@ -516,10 +517,12 @@ describe("Scope", function () {
                 throw "Error";
             });
 
-            setTimeout(function () {
+            waits(50);
+
+            runs(function () {
                 expect(scope.counter).toBe(1);
-                done();
-            }, 50);
+            });
+
         });
 
 
@@ -875,12 +878,10 @@ describe("Scope", function () {
 
             });
 
-            setTimeout(function () {
+            waits(50);
+            runs(function () {
                 expect(parent.counter).toBe(1);
-                done();
-
-            }, 50);
-
+            });
 
         });
 
@@ -948,7 +949,7 @@ describe("Scope", function () {
                     return scope.aValue;
                 },
                 function (newValue, oldValue, scope) {
-                    scope.counter ++;
+                    scope.counter++;
                 }
             );
 
@@ -982,12 +983,11 @@ describe("Scope", function () {
 
             });
 
-            setTimeout(function () {
-
+            waits(50);
+            runs(function () {
                 expect(parent.counter).toBe(1);
-                done();
+            });
 
-            }, 50);
         });
 
 
@@ -998,28 +998,28 @@ describe("Scope", function () {
             child.$evalAsync(function (scope) {
                 scope.didEvalAsync = true;
             });
-
-            setTimeout(function () {
+            waits(50);
+            runs(function () {
                 expect(child.didEvalAsync).toBe(true);
-                done();
-            }, 50);
+            });
         });
 
         it("executes postDigest functions on isolated scopes", function () {
             var parent = new Scope();
             var child = parent.$new();
 
-            child.$$postDigest(function (scope) {
-                scope.didPostDigest = true;
+            child.$$postDigest(function () {
+                child.didPostDigest = true;
             });
 
-            setTimeout(function () {
-                expect(child.didPostDigest).toBe(true);
-                done();
-            }, 50);
+            parent.$digest();
 
+            waits(50);
+            runs(function () {
+                expect(child.didPostDigest).toBe(true);
+            });
         });
-        
+
     });
 
 });

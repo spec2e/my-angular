@@ -1,4 +1,5 @@
-"use strict";
+/* jshint globalstrict: true */
+'use strict';
 
 var Scope = function () {
     this.$$watchers = [];
@@ -12,7 +13,7 @@ var Scope = function () {
 };
 
 
-function initWatchVal(){};
+function initWatchVal(){}
 
 Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
 
@@ -87,7 +88,6 @@ Scope.prototype.$digest = function () {
     this.$$root.$$lastDirtyWatch = null;
     this.$beginPhase("$digest");
     do {
-
         while (this.$$asyncQueue.length) {
             try {
                 var asyncTask = this.$$asyncQueue.shift();
