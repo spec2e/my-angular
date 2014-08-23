@@ -38,7 +38,19 @@ Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
             self.$$root.$$lastDirtyWatch = null;
         }
     };
+};
 
+Scope.prototype.$watchCollection = function (watchFn, listenerFn) {
+
+    var internalWatchFn = function () {
+
+    };
+
+    var internalListenerFn = function () {
+
+    };
+
+    return this.$watch(internalWatchFn(), internalListenerFn());
 
 };
 

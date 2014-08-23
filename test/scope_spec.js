@@ -1049,5 +1049,13 @@ describe("Scope", function () {
 
     });
 
+    describe("$watchCollection", function () {
+        var scope;
+
+        beforeEach(function () {
+            scope = new Scope();
+        });
+    });
+
 });
 
