@@ -979,7 +979,7 @@ describe("Scope", function () {
             );
 
             child2.$evalAsync(function (scope) {
-                console.log("1");
+
             });
 
             setTimeout(function () {
@@ -989,6 +989,37 @@ describe("Scope", function () {
 
             }, 50);
         });
+
+
+        it("executes evalAsync functions on isolated scope", function () {
+            var parent = new Scope();
+            var child = parent.$new(true);
+
+            child.$evalAsync(function (scope) {
+                scope.didEvalAsync = true;
+            });
+
+            setTimeout(function () {
+                expect(child.didEvalAsync).toBe(true);
+                done();
+            }, 50);
+        });
+
+        it("executes postDigest functions on isolated scopes", function () {
+            var parent = new Scope();
+            var child = parent.$new();
+
+            child.$$postDigest(function (scope) {
+                scope.didPostDigest = true;
+            });
+
+            setTimeout(function () {
+                expect(child.didPostDigest).toBe(true);
+                done();
+            }, 50);
+
+        });
+        
     });
 
 });
