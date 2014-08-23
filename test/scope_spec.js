@@ -1020,6 +1020,33 @@ describe("Scope", function () {
             });
         });
 
+        it("is not longer digested when $destoy has been called", function () {
+            var parent = new Scope();
+            var child = parent.$new();
+
+            child.aValue = [1, 2, 3];
+            child.counter = 0;
+            child.$watch(function (scope) {
+                return scope.aValue;
+            }, function (oldValue, newValue, scope) {
+                scope.counter ++;
+            }, true);
+
+
+            parent.$digest();
+            expect(child.counter).toBe(1);
+
+            child.aValue.push(4);
+            parent.$digest();
+            expect(child.counter).toBe(2);
+
+            child.$destroy();
+            child.aValue.push(5);
+            parent.$digest();
+            expect(child.counter).toBe(2);
+
+        });
+
     });
 
 });
