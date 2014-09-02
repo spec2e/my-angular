@@ -13,7 +13,8 @@ var Scope = function () {
 };
 
 
-function initWatchVal(){}
+function initWatchVal() {
+}
 
 Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
 
@@ -42,15 +43,27 @@ Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
 
 Scope.prototype.$watchCollection = function (watchFn, listenerFn) {
 
-    var internalWatchFn = function () {
+    var self = this,
+        newValue,
+        oldValue,
+        changeCount = 0;
 
+    var internalWatchFn = function (scope) {
+        newValue = watchFn(scope);
+
+        if(newValue !== oldValue) {
+            changeCount ++;
+        }
+        oldValue = newValue;
+
+        return changeCount;
     };
 
     var internalListenerFn = function () {
-
+        listenerFn(newValue, oldValue, self);
     };
 
-    return this.$watch(internalWatchFn(), internalListenerFn());
+    return this.$watch(internalWatchFn, internalListenerFn);
 
 };
 
@@ -197,7 +210,8 @@ Scope.prototype.$new = function (isolated) {
         child.$$asyncQueue = this.$$asyncQueue;
         child.$$postDigestQueue = this.$$postDigestQueue;
     } else {
-        var ChildScope = function () {};
+        var ChildScope = function () {
+        };
         ChildScope.prototype = this;
         child = new ChildScope();
     }
@@ -210,19 +224,19 @@ Scope.prototype.$new = function (isolated) {
 };
 
 Scope.prototype.$destroy = function () {
-    if(this === this.$$root) {
+    if (this === this.$$root) {
         return;
     }
 
     var siblings = this.$parent.$$children;
     var indexOfThis = siblings.indexOf(this);
-    if(indexOfThis >= 0) {
+    if (indexOfThis >= 0) {
         siblings.splice(indexOfThis, 1);
     }
 
 };
 
-Scope.prototype.$$everyScope = function(fn) {
+Scope.prototype.$$everyScope = function (fn) {
     if (fn(this)) {
         return this.$$children.every(function (child) {
             return child.$$everyScope(fn);
