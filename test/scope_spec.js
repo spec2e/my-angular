@@ -1083,6 +1083,28 @@ describe("Scope", function () {
             expect(scope.counter).toBe(2);
 
         });
+
+        it("works like a normal watch for NaNs", function () {
+
+            scope.aValue = 0 / 0;
+            scope.counter = 0;
+
+            scope.$watch(
+                function (scope) {
+                    return scope.aValue;
+                },
+                function (newValue, oldValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+        })
+
     });
 
 });
