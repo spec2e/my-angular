@@ -73,6 +73,17 @@ Scope.prototype.$watchCollection = function (watchFn, listenerFn) {
 
             } else {
 
+                if(!_.isObject(oldValue) || _.isArrayLike(oldValue)) {
+                    changeCount ++;
+                    oldValue = {};
+                }
+                _.forOwn(newValue, function (newVal, key) {
+                    if(oldValue[key] !== newVal) {
+                        changeCount ++;
+                        oldValue[key] = newVal;
+                    }
+                });
+
             }
         } else {
             if (!self.$$areEqual(newValue, oldValue, false)) {

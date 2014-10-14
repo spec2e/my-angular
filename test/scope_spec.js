@@ -848,10 +848,10 @@ describe("Scope", function () {
                 return scope.aValue;
             }, function (newValue, oldValue, scope) {
                 scope.counter++;
-            })
+            });
 
             child2.$apply(function (scope) {
-            })
+            });
 
             expect(parent.counter).toBe(1);
         });
@@ -1245,9 +1245,88 @@ describe("Scope", function () {
             scope.$digest();
             expect(scope.counter).toBe(2);
 
+        });
 
+        it("notices when the value becomes an object", function () {
+            scope.counter = 0;
+
+            scope.$watchCollection(
+                function (scope) {
+                    return scope.obj;
+                },
+                function (oldValue, newValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+            
+            scope.obj = {
+                aKey: 42
+            };
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+        });
+
+        it("notcies when an attribute is added to an object", function () {
+            scope.counter = 0;
+            scope.obj = {
+                a: 1
+            };
+
+            scope.$watchCollection(
+                function (scope) {
+                    return scope.obj;
+                },
+                function (oldValue, newValue, scope) {
+                    return scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+            scope.obj.b = 2;
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+
+            scope.$digest();
+            expect(scope.counter).toBe(2);
 
         });
+
+        it("notices when an attribute in an object changes", function () {
+            scope.counter = 0;
+            scope.obj = {
+                a: 1
+            };
+
+            scope.$watchCollection(
+                function (scope) {
+                    return scope.obj;
+                },
+                function (oldValue, newValue, scope) {
+                    scope.counter ++;
+                }
+            );
+
+            scope.$digest();
+            expect(scope.counter).toBe(1);
+
+            scope.obj.a = 2;
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+
+            scope.$digest();
+            expect(scope.counter).toBe(2);
+
+
+
+        })
 
     });
 
