@@ -9,6 +9,7 @@ var Scope = function () {
     this.$$phase = null;
     this.$$children = [];
     this.$$root = this;
+    this.$$listeners = {};
 
 };
 
@@ -256,6 +257,7 @@ Scope.prototype.$new = function (isolated) {
     child.$$watchers = [];
     child.$$children = [];
     child.$parent = this;
+    child.$$listeners = [];
     return child;
 };
 
@@ -280,4 +282,26 @@ Scope.prototype.$$everyScope = function (fn) {
     } else {
         return false;
     }
+};
+
+Scope.prototype.$on = function (eventName, listener) {
+    var listeners = this.$$listeners[eventName];
+    if(!listeners) {
+        this.$$listeners[eventName] = listeners = [];
+    }
+    listeners.push(listener);
+};
+
+Scope.prototype.$emit = function (eventName) {
+    var listeners = this.$$listeners[eventName] || [];
+    _.forEach(listeners, function (listener) {
+       listener();
+    });
+};
+
+Scope.prototype.$broadcast = function (eventName) {
+    var listeners = this.$$listeners[eventName] || [];
+    _.forEach(listeners, function (listener) {
+       listener();
+    });
 };
